@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 // Company API
 Route::prefix('company')->middleware('auth:sanctum')->name('company.')->group(function () {
-    Route::get('', [CompanyController::class, 'all'])->name('fetch');
+    Route::get('', [CompanyController::class, 'fetch'])->name('fetch');
     Route::post('', [CompanyController::class, 'create'])->name('create');
     Route::post('update/{id}', [CompanyController::class, 'update'])->name('update');
 });

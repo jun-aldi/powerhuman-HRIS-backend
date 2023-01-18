@@ -23,24 +23,24 @@ class CompanyController extends Controller
         $limit = $request->input('limit', 10); //setiap kit ngambil data berpa maksimal ngambil data
         // biasa digunakan untuk return data lebih dari 1
 
-
+        $companyQuery = Company::with(['users'])->whereHas('users', function ($query) {
+            $query->where('user_id', Auth::id());
+        });
 
         //jika data satuan
         if ($id) {
-            $company = Company::with(['users'])->find($id);
+            $company = $companyQuery->find($id);
 
             //jika company didapatkan
             if ($company) {
-                return ResponseFormatter::success($company);
+                return ResponseFormatter::success($company, 'Company Found');
             }
 
-            return ResponseFormatter::error('Company not found');
+            return ResponseFormatter::error('Company not found', 404);
         }
 
         //pangil company yg dikelola user
-        $companies = Company::whereHas('users', function ($query) {
-            $query->where('user_id', Auth::id());
-        });
+        $companies = $companyQuery;
         //ingin manggil siapa yang megang company
 
 
