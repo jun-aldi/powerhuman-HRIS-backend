@@ -16,7 +16,7 @@ class CompanyController extends Controller
 {
 
 
-    public function all(Request $request)
+    public function fetch(Request $request)
     {
         $id = $request->input('id'); // powerhuman.com/api.company?id=1
         $name = $request->input('name'); // powerhuman.com/api.company?name=1
@@ -37,7 +37,10 @@ class CompanyController extends Controller
             return ResponseFormatter::error('Company not found');
         }
 
-        $companies = Company::with(['users']); //pangil company user
+        //pangil company yg dikelola user
+        $companies = Company::whereHas('users', function ($query) {
+            $query->where('user_id', Auth::id());
+        });
         //ingin manggil siapa yang megang company
 
 

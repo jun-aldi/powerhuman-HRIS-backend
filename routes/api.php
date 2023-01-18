@@ -16,24 +16,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 // Company API
-Route::group(
-    [
-        'prefix' => 'company', // company/
-        'middleware' => 'auth:sanctum'
-    ],
-    function () {
-        Route::get('', [CompanyController::class, 'all']);
-        Route::post('', [CompanyController::class, 'create'])->name('company');
-        Route::put('', [CompanyController::class, 'update'])->name('company');
-    }
-);
-
+Route::prefix('company')->middleware('auth:sanctum')->name('company.')->group(function () {
+    Route::get('', [CompanyController::class, 'all'])->name('fetch');
+    Route::post('', [CompanyController::class, 'create'])->name('create');
+    Route::post('update/{id}', [CompanyController::class, 'update'])->name('update');
+});
 
 
 // Auth API
-Route::post('login', [UserController::class, 'login'])->name('login');
-Route::post('register', [UserController::class, 'register'])->name('register');
-//logout karena ambil token login pakai middleware
-Route::post('logout', [UserController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
-//fetch harus login dl
-Route::get('user', [UserController::class, 'fetch'])->name('user')->middleware('auth:sanctum');
+Route::name('auth.')->group(function () {
+    Route::post('login', [UserController::class, 'login'])->name('login');
+    Route::post('register', [UserController::class, 'register'])->name('register');
+    Route::middleware(['auth:sanctum'])->group(function () {
+        //logout karena ambil token login pakai middleware
+        Route::post('logout', [UserController::class, 'logout'])->name('logout');
+        //fetch harus login dl
+        Route::get('user', [UserController::class, 'fetch'])->name('user');
+    });
+});
