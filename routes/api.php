@@ -15,11 +15,22 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+// Company API
+Route::group(
+    [
+        'prefix' => 'company', // company/
+        'middleware' => 'auth:sanctum'
+    ],
+    function () {
+        Route::get('', [CompanyController::class, 'all']);
+        Route::post('', [CompanyController::class, 'create'])->name('company');
+        Route::put('', [CompanyController::class, 'update'])->name('company');
+    }
+);
 
 
-Route::get('/company', [CompanyController::class, 'all']);
 
-
+// Auth API
 Route::post('login', [UserController::class, 'login'])->name('login');
 Route::post('register', [UserController::class, 'register'])->name('register');
 //logout karena ambil token login pakai middleware

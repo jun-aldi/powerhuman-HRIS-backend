@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+use Exception;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseFormatter;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CreateCompanyRequest;
+use App\Http\Requests\UpdateCompanyRequest;
+use App\Models\User;
 
 class CompanyController extends Controller
 {
@@ -46,5 +51,67 @@ class CompanyController extends Controller
             $companies->paginate($limit),
             'Companies found'
         );
+    }
+
+    public function create(CreateCompanyRequest $request)
+    {
+
+        try {
+            // Upload Logo
+            if ($request->hasFile('logo')) {
+                $path = $request->file('logo')->store('public/logos');
+            }
+
+            // Create Company
+            $company = Company::create([
+                'name' => $request->name,
+                'logo' => $path,
+            ]);
+
+            if (!$company) {
+                throw new Exception('Company not created');
+            }
+
+            //Attach company to user
+            $user = User::find(Auth::id());
+            $user->companies()->attach($company->id);
+
+            // Load users at company
+            $company->load('users');
+
+            return ResponseFormatter::success($company, 'Company Created');
+        } catch (Exception $error) {
+            return ResponseFormatter::error($error->getMessage(), 500);
+        }
+    }
+
+    public function update(UpdateCompanyRequest $request, $id)
+    {
+        try {
+
+            // Search id
+            $company = Company::find($id);
+
+            // If id not found
+            if (!$company) {
+                throw new Exception('Company not found');
+            }
+
+            // Upload logo
+            if ($request->hasFile('logo')) {
+                $path = $request->file('logo')->store('public/logos');
+            }
+
+            // Update logo
+            $company->update([
+                'name' => $request->name,
+                'logo' => $path
+            ]);
+
+            // Return Response
+            return ResponseFormatter::success($company, 'Company Updated');
+        } catch (Exception $error) {
+            return ResponseFormatter::error($error->getMessage(), 500);
+        }
     }
 }
