@@ -15,9 +15,11 @@ class UserCompanySeeder extends Seeder
      */
     public function run()
     {
-        DB::table('user_company')->insert([
-            'user_id' => range(1, 10),
-            'company_id' => range(1, 10)
-        ]);
+        for ($i = 0; $i < 30; $i++) {
+            DB::table('user_company')->insert([
+                'user_id' => rand(1, 10),
+                'company_id' => rand(1, 10),
+            ]);
+        }
     }
 }
