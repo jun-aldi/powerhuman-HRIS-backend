@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\CompanyController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::get('/company', [CompanyController::class, 'all']);
+
+
+Route::post('login', [UserController::class, 'login'])->name('login');
+Route::post('register', [UserController::class, 'register'])->name('register');
+//logout karena ambil token login pakai middleware
+Route::post('logout', [UserController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
+//fetch harus login dl
+Route::get('user', [UserController::class, 'fetch'])->name('user')->middleware('auth:sanctum');
