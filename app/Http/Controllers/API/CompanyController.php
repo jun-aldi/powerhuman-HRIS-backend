@@ -107,7 +107,7 @@ class CompanyController extends Controller
             // Update logo
             $company->update([
                 'name' => $request->name,
-                'logo' => $path
+                'logo' => isset($path) ? $path : $company->icon,
             ]);
 
             // Return Response
