@@ -38,7 +38,6 @@ class CompanyController extends Controller
 
             return ResponseFormatter::error('Company not found', 404);
         }
-
         //pangil company yg dikelola user
         $companies = $companyQuery;
         //ingin manggil siapa yang megang company
