@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use Exception;
 use App\Models\Role;
-use App\Models\Company;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
@@ -16,34 +15,33 @@ class RoleController extends Controller
 {
     public function fetch(Request $request)
     {
-        $id = $request->input('id'); // powerhuman.com/api.company?id=1
-        $name = $request->input('name'); // powerhuman.com/api.company?name=1
-        $limit = $request->input('limit', 10); //setiap kit ngambil data berpa maksimal ngambil data
-        // biasa digunakan untuk return data lebih dari 1
+        $id = $request->input('id');
+        $name = $request->input('name');
+        $limit = $request->input('limit', 10);
+        $with_responsibilities = $request->input('with_responsibilities', false);
 
-        $roleQuery = Role::where('company_id', $request->company_id);
+        $roleQuery = Role::query();
 
-        //jika data satuan
+        // Get single data
         if ($id) {
-            $role = $roleQuery->find($id);
+            $role = $roleQuery->with('responsibilities')->find($id);
 
-            //jika role didapatkan
             if ($role) {
-                return ResponseFormatter::success($role, 'Role Found');
+                return ResponseFormatter::success($role, 'Role found');
             }
 
             return ResponseFormatter::error('Role not found', 404);
         }
 
-        //pangil role yg dikelola user
-        $roles = $roleQuery;
-        //ingin manggil siapa yang megang role
+        // Get multiple data
+        $roles = $roleQuery->where('company_id', $request->company_id);
 
-
-        //jika ingin cari berdasarkan nama
-        //powerhuman.com/api/role?name=kunto
         if ($name) {
             $roles->where('name', 'like', '%' . $name . '%');
+        }
+
+        if ($with_responsibilities) {
+            $roles->with('responsibilities');
         }
 
         return ResponseFormatter::success(
@@ -54,50 +52,44 @@ class RoleController extends Controller
 
     public function create(CreateRoleRequest $request)
     {
-
         try {
-            // Upload icon
-
-
-            // Create Role
+            // Create role
             $role = Role::create([
                 'name' => $request->name,
                 'company_id' => $request->company_id,
-
             ]);
 
             if (!$role) {
                 throw new Exception('Role not created');
             }
 
-            return ResponseFormatter::success($role, 'Role Created');
-        } catch (Exception $error) {
-            return ResponseFormatter::error($error->getMessage(), 500);
+            return ResponseFormatter::success($role, 'Role created');
+        } catch (Exception $e) {
+            return ResponseFormatter::error($e->getMessage(), 500);
         }
     }
 
     public function update(UpdateRoleRequest $request, $id)
     {
-        try {
 
-            // Search id
+        try {
+            // Get role
             $role = Role::find($id);
 
-            // If id not found
+            // Check if role exists
             if (!$role) {
-                // throw new Exception('Role not found');
+                throw new Exception('Role not found');
             }
 
-            // Update Role
+            // Update role
             $role->update([
                 'name' => $request->name,
                 'company_id' => $request->company_id,
             ]);
 
-            // Return Response
-            return ResponseFormatter::success($role, 'Role Updated');
-        } catch (Exception $error) {
-            return ResponseFormatter::error($error->getMessage(), 500);
+            return ResponseFormatter::success($role, 'Role updated');
+        } catch (Exception $e) {
+            return ResponseFormatter::error($e->getMessage(), 500);
         }
     }
 
