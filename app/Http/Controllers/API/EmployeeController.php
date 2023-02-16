@@ -140,7 +140,7 @@ class EmployeeController extends Controller
                 'gender' => $request->gender,
                 'age' => $request->age,
                 'phone' => $request->phone,
-                'photo' => isset($path) ? $path : $employee->icon, // ada path gak
+                'photo' => isset($path) ? $path : $employee->photo, // ada path gak
                 // kalau ada path pakai baru
                 //kalau gk ada pakai data yang baru
                 'team_id' => $request->team_id,
