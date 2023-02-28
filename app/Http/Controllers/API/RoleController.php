@@ -20,7 +20,7 @@ class RoleController extends Controller
         $limit = $request->input('limit', 10);
         $with_responsibilities = $request->input('with_responsibilities', false);
 
-        $roleQuery = Role::query();
+        $roleQuery = Role::withCount('employee');
 
         // Get single data
         if ($id) {

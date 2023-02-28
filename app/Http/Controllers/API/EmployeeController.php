@@ -27,7 +27,7 @@ class EmployeeController extends Controller
         $limit = $request->input('limit', 10); //setiap kit ngambil data berpa maksimal ngambil data
         // biasa digunakan untuk return data lebih dari 1
 
-        $employeeQuery = Employee::query();
+        $employeeQuery = Employee::with('team', 'role');
 
         //jika data satuan
         if ($id) {
